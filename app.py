@@ -11,15 +11,9 @@ def generate_gta_telemetry(n=10000):
     np.random.seed(42)
     start_date = datetime(2026, 1, 1)
     dates = [start_date + timedelta(seconds=np.random.randint(0, 3888000)) for _ in range(n)]
-    
     archetypes = ['Grinder', 'Griefer', 'Casual', 'Whale', 'Modder']
     platforms = ['PC', 'PS5', 'Xbox Series X']
-    logs = [
-        "Successful Cayo Perico Heist", "Purchased Oppressor MKII", 
-        "Player Reported for Griefing", "Unexpected Currency Injection",
-        "Excellent Heist Leader", "Suspicious Mod-Menu Activity",
-        "Shark Card Bundle Purchased", "Passive Mode Abused"
-    ]
+    logs = ["Successful Cayo Perico Heist", "Purchased Oppressor MKII", "Suspicious Mod-Menu Activity", "Shark Card Bundle Purchased"]
     
     df = pd.DataFrame({
         'Player_ID': [f"USER_{i:06d}" for i in range(n)],
@@ -27,146 +21,118 @@ def generate_gta_telemetry(n=10000):
         'Platform': np.random.choice(platforms, n),
         'Archetype': np.random.choice(archetypes, n, p=[0.4, 0.15, 0.3, 0.1, 0.05]),
         'K/D_Ratio': np.random.lognormal(mean=0.2, sigma=0.8, size=n),
-        'Citizen_Kills': np.random.poisson(lam=5, size=n) * np.random.randint(1, 5, n),
+        'Citizen_Kills': np.random.poisson(lam=5, size=n),
         'Bank_Balance_GTA$': np.random.lognormal(mean=14, sigma=2.5, size=n),
         'Shark_Card_Spend': np.random.exponential(scale=50, size=n),
         'Action_Log': np.random.choice(logs, n)
     })
-    
     df['Toxicity_Z'] = stats.zscore(df['K/D_Ratio'] + df['Citizen_Kills'])
     df['Lead_Digit'] = df['Bank_Balance_GTA$'].apply(lambda x: int(str(int(x))[0]) if x > 0 else 0)
-    risk_pattern = r"(Mod|Grief|Injection|Suspicious|Abuse)"
-    df['Behavior_Flag'] = df['Action_Log'].apply(lambda x: 1 if re.search(risk_pattern, x, re.IGNORECASE) else 0)
+    df['Behavior_Flag'] = df['Action_Log'].apply(lambda x: 1 if "Mod" in x else 0)
     df['Hour'] = df['Timestamp'].dt.hour
     return df
 
 df = generate_gta_telemetry()
 
-# --- 2. GTA V AESTHETIC INJECTION ---
+# --- 2. THE ULTIMATE GTA AESTHETIC ---
 st.set_page_config(page_title="LOS SANTOS INTEL", layout="wide")
 
-st.markdown("""
+# Using a high-quality GTA V themed background with a dark overlay
+BG_IMG = "https://images.alphacoders.com/463/463838.jpg" 
+
+st.markdown(f"""
     <style>
-    /* Main Background and Text */
-    .stApp {
-        background-color: #000000;
-        color: #FFFFFF;
-    }
-    /* GTA Header Style */
-    .gta-title {
-        font-family: 'Arial Black', Gadget, sans-serif;
-        color: #FFFFFF;
+    /* Background Image with Dark Overlay */
+    .stApp {{
+        background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
+                    url("{BG_IMG}");
+        background-size: cover;
+        background-attachment: fixed;
+    }}
+    
+    /* GTA Title Font Style */
+    .gta-title {{
+        font-family: 'Arial Black', sans-serif;
+        color: white;
         text-transform: uppercase;
         letter-spacing: -2px;
-        font-size: 3rem;
-        border-bottom: 5px solid #FF9D00;
-        margin-bottom: 20px;
-    }
-    /* Highlight Orange */
-    .highlight { color: #FF9D00; }
-    
-    /* Sidebar Styling */
-    section[data-testid="stSidebar"] {
-        background-color: #111111;
-        border-right: 1px solid #333;
-    }
-    
+        font-size: 3.5rem;
+        text-shadow: 3px 3px #000000;
+        border-left: 10px solid #FF9D00;
+        padding-left: 20px;
+        margin-bottom: 30px;
+    }}
+
+    /* Styling the Sidebar to look like a HUD menu */
+    section[data-testid="stSidebar"] {{
+        background-color: rgba(15, 15, 15, 0.95) !important;
+        border-right: 2px solid #FF9D00;
+    }}
+
     /* Metric Cards */
-    [data-testid="stMetricValue"] {
+    [data-testid="stMetricValue"] {{
         color: #FF9D00 !important;
-        font-family: 'Courier New', Courier, monospace;
-    }
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+    }}
+    
+    /* Custom Info Button Style */
+    .stPopover button {{
+        background-color: #FF9D00 !important;
+        color: black !important;
+        border-radius: 0px !important;
+        font-weight: bold !important;
+        text-transform: uppercase;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
-st.markdown('<h1 class="gta-title">SECURE <span class="highlight">SERV</span> INTEL SYSTEM</h1>', unsafe_allow_html=True)
-
-# --- 3. SIDEBAR: THE BAN-HAMMER CONSOLE ---
+# --- 3. SIDEBAR WITH LOGO FIX ---
 with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/e/e1/Grand_Theft_Auto_V_logo.svg", width=100)
-    st.header("ADMIN CONSOLE")
-    selected_platform = st.multiselect("PLATFORM NETWORK", df['Platform'].unique(), default=df['Platform'].unique())
-    selected_archetype = st.multiselect("BEHAVIORAL TYPE", df['Archetype'].unique(), default=df['Archetype'].unique())
+    # Reliable logo link (PNG instead of SVG for better compatibility)
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Grand_Theft_Auto_V_logo.svg/1200px-Grand_Theft_Auto_V_logo.svg.png", use_container_width=True)
+    st.markdown("<h2 style='text-align: center; color: #FF9D00;'>ADMIN CONSOLE</h2>", unsafe_allow_html=True)
+    
+    selected_platform = st.multiselect("NETWORK PLATFORM", df['Platform'].unique(), default=df['Platform'].unique())
+    selected_archetype = st.multiselect("BEHAVIORAL PROFILE", df['Archetype'].unique(), default=df['Archetype'].unique())
     
     st.divider()
     ban_sensitivity = st.slider("DETECTION SENSITIVITY", 1.5, 5.0, 3.0)
     shark_card_min = st.number_input("MIN SHARK SPEND ($)", 0, 1000, 0)
 
-# Filter Data
-mask = (df['Platform'].isin(selected_platform)) & \
-       (df['Archetype'].isin(selected_archetype)) & \
-       (df['Shark_Card_Spend'] >= shark_card_min)
-f_df = df[mask]
+# Filter Logic
+f_df = df[(df['Platform'].isin(selected_platform)) & (df['Archetype'].isin(selected_archetype)) & (df['Shark_Card_Spend'] >= shark_card_min)]
 
-# --- 4. TELEMETRY METRICS ---
+# --- 4. THE INTERFACE ---
+st.markdown('<div class="gta-title">SECURE <span style="color:#FF9D00">SERV</span> TERMINAL</div>', unsafe_allow_html=True)
+
 m1, m2, m3, m4 = st.columns(4)
 with m1:
     st.metric("SESSIONS", len(f_df))
-    with st.popover("ℹ️ Info"):
-        st.write("Total active player connections currently being monitored in the Los Santos grid.")
-
+    st.popover("HUD Info").write("Live connection count across Los Santos servers.")
 with m2:
     st.metric("AVG K/D", round(f_df['K/D_Ratio'].mean(), 2))
-    with st.popover("ℹ️ Info"):
-        st.write("Average Kill/Death ratio. Extreme spikes often correlate with 'Griefing' behavior.")
-
+    st.popover("Combat Info").write("The average aggressiveness of the current lobby.")
 with m3:
-    flagged_toxic = f_df[f_df['Toxicity_Z'] > ban_sensitivity]
-    st.metric("FLAGGED", len(flagged_toxic), delta=f"{len(flagged_toxic)} Threat", delta_color="inverse")
-    with st.popover("ℹ️ Info"):
-        st.write("Players exceeding the Toxicity Z-Score threshold. Candidates for the Ban-Hammer.")
-
+    flagged = f_df[f_df['Toxicity_Z'] > ban_sensitivity]
+    st.metric("THREATS", len(flagged), delta=f"{len(flagged)} Flagged", delta_color="inverse")
+    st.popover("Security Info").write("Users identified as Griefers or Modders based on Z-Score variance.")
 with m4:
-    wealth_gini = f_df['Bank_Balance_GTA$'].sum() / 1e9
-    st.metric("CASH FLOW", f"${wealth_gini:.1f}B")
-    with st.popover("ℹ️ Info"):
-        st.write("Total liquid GTA$ circulating in the selected archetype economy.")
+    vol = f_df['Bank_Balance_GTA$'].sum() / 1e9
+    st.metric("ECONOMY", f"${vol:.1f}B")
+    st.popover("Cash Info").write("Total circulating GTA Dollars in this sector.")
 
 st.markdown("---")
 
-# --- 5. FORENSIC VISUALIZATIONS ---
+# Visuals
 col_a, col_b = st.columns(2)
-
 with col_a:
-    st.subheader("🏦 MONEY GLITCH DETECTION")
-    with st.popover("Analysis Method"):
-        st.markdown("**Benford's Law Analysis**")
-        st.write("Organic numbers follow a specific distribution. Spikes in the chart suggest manually injected currency (modding/glitching).")
-    
-    benford_counts = f_df['Lead_Digit'].value_counts(normalize=True).sort_index().drop(0, errors='ignore')
-    st.bar_chart(benford_counts, color="#FF9D00")
+    st.subheader("🏦 ANTI-CHEAT: MONEY DISTRO")
+    st.popover("Methodology").write("Detecting non-organic currency spikes (Glitching).")
+    benford = f_df['Lead_Digit'].value_counts(normalize=True).sort_index().drop(0, errors='ignore')
+    st.bar_chart(benford, color="#FF9D00")
 
 with col_b:
-    st.subheader("🌙 GHOST HOUR ACTIVITY")
-    with st.popover("Analysis Method"):
-        st.write("Monitoring server load by hour. The 'Ghost Hour' (2 AM - 5 AM) is typically when mod-menu developers test new exploits.")
-    
-    hourly_trends = f_df.groupby('Hour').size()
-    st.line_chart(hourly_trends, color="#FFFFFF")
-
-st.divider()
-
-col_c, col_d = st.columns(2)
-
-with col_c:
-    st.subheader("💰 SPEND VS. TOXICITY")
-    with st.popover("Analysis Method"):
-        st.write("Scatter plot correlating real-world Shark Card spending with in-game aggression (K/D). Helps identify 'Aggressive Whales'.")
-    st.scatter_chart(data=f_df, x='Shark_Card_Spend', y='K/D_Ratio', color='Archetype')
-
-with col_d:
-    st.subheader("⚠️ REGEX RISK FLAGS")
-    with st.popover("Analysis Method"):
-        st.write("Real-time log scanning for keywords like 'Injection', 'Mod', or 'Abuse' across platforms.")
-    risk_dist = f_df.groupby('Platform')['Behavior_Flag'].sum()
-    st.bar_chart(risk_dist, color="#FF0000")
-
-# --- 6. THE "BAN-HAMMER" AUDIT TRAIL ---
-st.markdown('<h2 style="color:#FF0000;">🚨 HIGH-PRIORITY ENFORCEMENT LIST</h2>', unsafe_allow_html=True)
-audit_trail = f_df[(f_df['Toxicity_Z'] > ban_sensitivity) | (f_df['Behavior_Flag'] == 1)]
-audit_trail = audit_trail.sort_values(by='Toxicity_Z', ascending=False)
-
-st.dataframe(
-    audit_trail[['Player_ID', 'Platform', 'Archetype', 'K/D_Ratio', 'Toxicity_Z', 'Action_Log']], 
-    use_container_width=True
-)
+    st.subheader("🌙 PEAK CRIME HOURS")
+    st.popover("Methodology").write("Correlating time of day with mod-menu usage spikes.")
+    st.line_chart(f_df.groupby('Hour').size(), color="#FFFFFF")
