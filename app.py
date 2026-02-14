@@ -312,18 +312,85 @@ st.markdown(f"""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. SIDEBAR WITH WORKING LOGO ---
+# --- 3. SIDEBAR WITH CUSTOM GTA V LOGO ---
 with st.sidebar:
-    # Using a direct PNG link that works reliably
-    try:
-        st.image("https://logos-world.net/wp-content/uploads/2021/02/GTA-5-Logo.png", use_container_width=True)
-    except:
-        # Fallback if image fails to load
-        st.markdown("""
-            <div style='text-align: center; padding: 20px; background: rgba(78, 203, 113, 0.2); border: 3px solid #4ECB71; margin-bottom: 20px;'>
-                <h1 style='color: #4ECB71; font-family: Impact; font-size: 3rem; margin: 0; text-shadow: 3px 3px 0px #000000;'>GTA V</h1>
+    # Custom styled GTA V logo that always works
+    st.markdown("""
+    <div class='gta-logo-container'>
+        <div class='gta-logo'>
+            <div class='gta-v-text'>
+                <span class='gta-grand'>GRAND</span>
+                <span class='gta-theft'>THEFT</span>
+                <span class='gta-auto'>AUTO</span>
+                <span class='gta-five'>V</span>
             </div>
-        """, unsafe_allow_html=True)
+        </div>
+    </div>
+    
+    <style>
+    .gta-logo-container {
+        text-align: center;
+        margin-bottom: 25px;
+        padding: 20px 10px;
+        background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,20,0.95) 100%);
+        border: 4px solid #4ECB71;
+        border-radius: 8px;
+        box-shadow: 
+            0 0 30px rgba(78, 203, 113, 0.5),
+            inset 0 0 20px rgba(0, 0, 0, 0.8);
+    }
+    
+    .gta-v-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .gta-grand, .gta-theft, .gta-auto {
+        font-family: 'Pricedown', 'Impact', sans-serif;
+        color: #FFFFFF;
+        font-size: 1.8rem;
+        letter-spacing: 2px;
+        text-shadow: 
+            3px 3px 0px #000000,
+            0 0 15px rgba(255, 255, 255, 0.3);
+        line-height: 1.2;
+    }
+    
+    .gta-five {
+        font-family: 'Pricedown', 'Impact', sans-serif;
+        color: #4ECB71;
+        font-size: 5rem;
+        font-weight: 900;
+        letter-spacing: -5px;
+        text-shadow: 
+            5px 5px 0px #000000,
+            8px 8px 0px rgba(0, 0, 0, 0.5),
+            0 0 30px rgba(78, 203, 113, 0.8),
+            0 0 50px rgba(78, 203, 113, 0.5);
+        line-height: 0.8;
+        margin-top: 5px;
+        animation: vGlow 2s ease-in-out infinite;
+    }
+    
+    @keyframes vGlow {
+        0%, 100% { 
+            text-shadow: 
+                5px 5px 0px #000000,
+                8px 8px 0px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(78, 203, 113, 0.8),
+                0 0 50px rgba(78, 203, 113, 0.5);
+        }
+        50% { 
+            text-shadow: 
+                5px 5px 0px #000000,
+                8px 8px 0px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(78, 203, 113, 1),
+                0 0 70px rgba(78, 203, 113, 0.7);
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
     st.markdown("<h2 style='text-align: center; color: #4ECB71;'>⚙️ ADMIN CONSOLE</h2>", unsafe_allow_html=True)
     
